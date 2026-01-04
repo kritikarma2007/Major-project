@@ -1,0 +1,383 @@
+
+  <% layout('layouts/boilerplate') %>
+ <!-- <body> -->
+  <div class ="row"> 
+    <div class="col-8 offset-3">
+
+
+    <h3><%=listing.title %> </h3>
+    </div>
+     <div class="card col-6  offset-3 show-card listing-card">
+         <img src="<%= listing.image?.url || listing.image %>" class="card-img-top show-img" alt="listing_image">
+            <div class="card-body">
+             <p class="card-text"> Owned by-<i> <%=listing.owner.username%></i></p>
+              <p class="card-text"> <%= listing.description %></p>
+               <p class="card-text">  &#8377; <%= (listing.price || 0).toLocaleString("en-IN")%>/night</p>
+               <p class="card-text">  <%= listing.location %></p>
+             <p class="card-text">  <%= listing.country %></p>
+            </div>
+     </div>
+<!-- 
+    <ul>
+        <li> <%= listing.title %></li>
+        <li> <%= listing.description %></li>
+        <li> &#8377; <%= listing.price.toLocaleString("en-IN")%></li>
+        <li> <%= listing.location %></li>
+        <li> <%= listing.country %></li>
+    </ul> -->
+    <br />
+<!-- <div id="btn"> -->
+    <% if (currUser && String(currUser._id) === String(listing.owner._id)) { %>
+      <div class="btns">
+        <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-2 edit-btn">Edit</a>
+        <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" style="display:inline; margin-left:12px;">
+          <button class="btn btn-dark">Delete</button>
+        </form>
+      </div>
+    <% } %>
+
+    <div class=" b-btn">
+      <a href="/listings/<%= listing._id %>/book" class="btn btn-dark col-1 offset-2 book-btn ">Book</a>
+    </div>
+    <div class="col-8 offset-3 mb-3" >
+      <% if(currUser){%>
+      <h4> Leave a Review</h4>
+      <form action="/listings/<%=listing._id%>/reviews" method="POST" novalidate class="needs-validation">
+       
+        <div class="mb-3 mt-3"> 
+            <label for ="rating" class="form-label">Rating</label>
+        <fieldset class="starability-slot">
+         
+  <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+  <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+  <label for="first-rate1" title="Terrible">1 star</label>
+  <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+  <label for="first-rate2" title="Not good">2 stars</label>
+  <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+  <label for="first-rate3" title="Average">3 stars</label>
+  <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+  <label for="first-rate4" title="Very good">4 stars</label>
+  <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+  <label for="first-rate5" title="Amazing">5 stars</label>
+</fieldset>
+</div>
+        <div class="mb-3 mt-3">
+          <label for="comment" class="form-label">Comments</label>
+          <textarea name="review[comment]"id="comment" cols="30" rows="5" class="form-control" required></textarea>
+          <div class="invalid-feedback"> Please submit some comments for review </div>
+        </div>
+        <button class="btn btn-outline-dark">Submit</button>
+      </form>
+      <hr>
+         <% }%>
+      <p><b>All Reviews </b></p> 
+      <div class="row">
+      <% for(review of listing.reviews){ %>
+        <div class="card col-5 ms-3 mb-3">
+            <div class="card-body">
+              <h5 class="card-title">@ <i><%= review.author.username %></i></h5>
+               <p class="starability-result card-text " data-rating="<%=review.rating %>"></p>
+              <p class="card-text mb-2"><%=review.comment %></p>
+            </div>
+        
+            <form class="mb-3" method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE" >
+              <button class="btn btn-sm btn-dark">Delete</button>
+            </form>
+        </div>
+      <%}%>
+    </div>
+
+    <!-- Booking requests visible to listing owner -->
+    <% if (listing.bookings && listing.bookings.length && currUser && String(currUser._id) === String(listing.owner._id)) { %>
+      <hr />
+      <h4 class="mt-3">Booking Requests</h4>
+      <div class="row">
+        <% listing.bookings.forEach(function(b){ %>
+          <div class="card col-6 ms-3 mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <h5 class="card-title"><%= b.name %></h5>
+                <span class="badge bg-secondary text-capitalize"><%= b.status %></span>
+              </div>
+              <p class="card-text">From: <%= new Date(b.from).toLocaleDateString() %> — To: <%= new Date(b.to).toLocaleDateString() %></p>
+              <p class="card-text">Contact: <%= b.contact %></p>
+              <p class="card-text"><small>Requested on: <%= new Date(b.createdAt).toLocaleString() %></small></p>
+
+              <% if (b.status === 'approved' && b.approvedAt) { %>
+                <p class="card-text"><small>Approved on: <%= new Date(b.approvedAt).toLocaleString() %></small></p>
+              <% } %>
+
+              <% if (currUser && String(currUser._id) === String(listing.owner._id) && b.status === 'pending') { %>
+                <div class="mt-2">
+                  <form method="POST" action="/listings/<%= listing._id %>/bookings/<%= b._id %>?_method=PATCH" style="display:inline;">
+                    <input type="hidden" name="status" value="approved" />
+                    <button class="btn btn-sm btn-success">Approve</button>
+                  </form>
+                  <form method="POST" action="/listings/<%= listing._id %>/bookings/<%= b._id %>?_method=PATCH" style="display:inline; margin-left:10px;">
+                    <input type="hidden" name="status" value="rejected" />
+                    <button class="btn btn-sm btn-danger">Reject</button>
+                  </form>
+                  <!-- Use direct POST fallback to /delete to avoid method-override issues in some environments -->
+                  <form method="POST" action="/listings/<%= listing._id %>/bookings/<%= b._id %>/delete" style="display:inline; margin-left:10px;">
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                  </form>
+                </div>
+              <% } %>
+
+              <% // Show a message to the requester if they have an unread userMessage %>
+              <% if (currUser && b.user && String(currUser._id) === String(b.user) && b.userMessage && !b.userMessageShown) { %>
+                <div class="alert alert-info mt-2">
+                  <%= b.userMessage %>
+                  <form method="POST" action="/listings/<%= listing._id %>/bookings/<%= b._id %>/seen?_method=PATCH" style="display:inline; margin-left:10px;">
+                    <button class="btn btn-sm btn-outline-secondary">Dismiss</button>
+                  </form>
+                </div>
+              <% } %>
+
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <!-- Show booking summary to the booking requester themselves -->
+    <% if (currUser) { %>
+      <hr />
+      <h4 class="mt-3">Your Bookings for this listing</h4>
+      <div class="row">
+        <% let hasYourBookings = false; %>
+        <% listing.bookings.forEach(function(b){ %>
+          <% if (b.user && String(currUser._id) === String(b.user)) { %>
+            <% hasYourBookings = true; %>
+            <div class="card col-6 ms-3 mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <h5 class="card-title">Your request — <%= b.name %></h5>
+                  <span class="badge text-capitalize <%= b.status === 'approved' ? 'bg-success' : (b.status === 'rejected' ? 'bg-danger' : 'bg-warning') %>"><%= b.status %></span>
+                </div>
+                <p class="card-text">From: <%= new Date(b.from).toLocaleDateString() %> — To: <%= new Date(b.to).toLocaleDateString() %></p>
+                <p class="card-text">Contact: <%= b.contact %></p>
+                <% if (b.userMessage) { %>
+                  <p class="card-text"><small><%= b.userMessage %></small></p>
+                <% } %>
+                <% if (!b.userMessageShown && b.userMessage) { %>
+                  <form method="POST" action="/listings/<%= listing._id %>/bookings/<%= b._id %>/seen?_method=PATCH" style="display:inline;">
+                    <button class="btn btn-sm btn-outline-secondary">Dismiss message</button>
+                  </form>
+                <% } %>
+                <% if (b.user && String(currUser._id) === String(b.user)) { %>
+                  <!-- Use direct POST fallback to /delete to avoid method-override issues in some environments -->
+                  <form method="POST" action="/listings/<%= listing._id %>/bookings/<%= b._id %>/delete" style="display:inline; margin-left:10px;">
+                    <button class="btn btn-sm btn-outline-danger">Cancel booking</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% } %>
+        <% }) %>
+        <% if (!hasYourBookings) { %>
+          <div class="col-12 ms-3">
+            <p>No bookings by you on this listing yet.</p>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+
+    </div>
+  </div>
+
+<!-- MapLibre CSS (keep inside your layout/body; avoid duplicate DOCTYPE/head tags) -->
+<link href="https://unpkg.com/maplibre-gl@2/dist/maplibre-gl.css" rel="stylesheet" />
+
+<style>
+  /* Improved map styles */
+  .map-card {
+    width: 80%;
+    max-width: 900px;
+    margin: 28px auto;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(14, 30, 37, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.03);
+  }
+
+  .title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #0f172a;
+  }
+
+  .search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .search-box input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #e6eef8;
+    font-size: 15px;
+    outline: none;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.02);
+  }
+
+  .search-box button {
+    padding: 11px 18px;
+    border-radius: 23px;
+    border: none;
+    background: linear-gradient(180deg, #fe424d 0%, #fe424d 100%);
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(37,99,235,0.18);
+  }
+
+  .search-box button:hover {
+    filter: brightness(0.95);
+    background-color: #fbfdff;
+  }
+  /* .btn-dark {
+   background-color: #fe424d !important;
+    /* background-color: #1e40af; */
+    /* border-color: #1e40af; */
+  /* }  */
+
+  #map {
+    height: 420px;
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(2,6,23,0.06);
+    overflow: hidden;
+  }
+
+  @media (max-width: 640px) {
+    .map-card { padding: 12px; }
+    #map { height: 300px; }
+  }
+</style>
+
+<div class="map-card">
+  <div class="title">📍 Search Place By Location</div>
+
+  <div class="search-box">
+    <input type="text" id="place" placeholder="Search city, area or country (e.g. Indore)" aria-label="Search location" />
+    <button id="searchBtn" >Search</button>
+  </div>
+
+  <div id="map" role="application" aria-label="Map"></div>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@2/dist/maplibre-gl.js"></script>
+
+<script>
+  (function(){
+    if (typeof maplibregl === 'undefined') {
+      console.error('MapLibre GL is not loaded. Map will be disabled.');
+      const btn = document.getElementById('searchBtn');
+      if (btn) btn.disabled = true;
+      return;
+    }
+
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [77.4126, 23.2599], // lng, lat
+      zoom: 5
+    });
+
+    map.addControl(new maplibregl.NavigationControl());
+
+    // Add OSM raster tiles on load for detailed streets and labels
+    map.on('load', function(){
+      if (!map.getSource('osm-tiles')){
+        map.addSource('osm-tiles', {
+          type: 'raster',
+          tiles: [
+            'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          ],
+          tileSize: 256
+        });
+        map.addLayer({
+          id: 'osm-tiles',
+          type: 'raster',
+          source: 'osm-tiles'
+        });
+      }
+    });
+
+    let marker;
+
+    function adjustZoomForBounds(bounds){
+      // Fit bounds then nudge zoom to street/neighborhood level for small areas
+      map.fitBounds(bounds, { padding: 60, duration: 800 });
+      const west = bounds[0][0], south = bounds[0][1], east = bounds[1][0], north = bounds[1][1];
+      const deltaLng = Math.abs(east - west);
+      const deltaLat = Math.abs(north - south);
+      const maxDelta = Math.max(deltaLng, deltaLat);
+      if (maxDelta < 0.02) {
+        map.setZoom(16);
+      } else if (maxDelta < 0.2) {
+        map.setZoom(14);
+      } else if (maxDelta < 2) {
+        map.setZoom(12);
+      }
+    }
+
+    async function searchPlace() {
+      const placeEl = document.getElementById('place');
+      const place = placeEl ? placeEl.value.trim() : '';
+      if (!place) return;
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}&limit=5`);
+        if (!res.ok) throw new Error('Geocoder network error');
+        const data = await res.json();
+        if (!data.length) { alert('Location not found'); return; }
+        const loc = data[0];
+        const lat = parseFloat(loc.lat);
+        const lon = parseFloat(loc.lon);
+        const south = parseFloat(loc.boundingbox[0]);
+        const north = parseFloat(loc.boundingbox[1]);
+        const west = parseFloat(loc.boundingbox[2]);
+        const east = parseFloat(loc.boundingbox[3]);
+        const bounds = [ [west, south], [east, north] ];
+
+        adjustZoomForBounds(bounds);
+
+        if (marker) marker.remove();
+        marker = new maplibregl.Marker({ color: '#dc2626' })
+          .setLngLat([lon, lat])
+          .setPopup(new maplibregl.Popup({ offset: 25 }).setText(loc.display_name))
+          .addTo(map)
+          .togglePopup();
+      } catch (e) {
+        console.error(e);
+        alert('Failed to search location. Check console for details.');
+      }
+    }
+
+    const searchBtn = document.getElementById('searchBtn');
+    const placeInput = document.getElementById('place');
+    if (searchBtn) searchBtn.addEventListener('click', searchPlace);
+    if (placeInput) placeInput.addEventListener('keypress', function(e){ if (e.key === 'Enter') { e.preventDefault(); searchPlace(); } });
+
+    // // Optionally, show listing coordinates (if your listing model stores them). This keeps the map useful for the current listing.
+    // <% if (typeof listing !== 'undefined' && listing.latitude && listing.longitude) { %>
+    //   (function(){
+    //     const lng = <%= JSON.stringify(listing.longitude) %>;
+    //     const lat = <%= JSON.stringify(listing.latitude) %>;
+    //     const pin = new maplibregl.Marker({ color: '#1d4ed8' })
+    //       .setLngLat([lng, lat])
+    //       .setPopup(new maplibregl.Popup({ offset: 25 }).setText(<%= JSON.stringify(listing.location || '') %>))
+    //       .addTo(map);
+    //     map.setCenter([lng, lat]);
+    //     map.setZoom(12);
+    //   })();
+    // <% } %>
+  })();
+</script>
