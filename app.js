@@ -69,9 +69,9 @@ const sessionOptions ={
 };
 
 
-app.get("/", (req, res) => {
-   res.redirect("/listings");   
-});
+// app.get("/", (req, res) => {
+//    res.redirect("/listings");   
+// });
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -105,6 +105,11 @@ app.use((req,res,next)=>{
 //     let registeredUser = await User.register(fakeUser,"hello");
 //     res.send(registeredUser);
 // })
+
+app.get("/", (req, res) => {
+   res.redirect("/listings");   
+});
+
 app.use("/listings",listingsRouter)
 // app.get('/listings/search', async (req, res) => {
 //   const searchQuery = req.query.q;  // Use 'q' param for search
