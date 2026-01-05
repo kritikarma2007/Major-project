@@ -16,7 +16,7 @@ module.exports.renderSignupForm= (req,res)=>{
      if(err){
        return next(err);
      }
-     req.flash("success","Welcome to ToolBnB !");
+     req.flash("success","Welcome to RentVibe !");
     res.redirect("/listings");
     });
     
