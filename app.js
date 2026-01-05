@@ -110,6 +110,7 @@ app.get("/", (req, res) => {
    res.redirect("/listings");   
 });
 
+
 app.use("/listings",listingsRouter)
 // app.get('/listings/search', async (req, res) => {
 //   const searchQuery = req.query.q;  // Use 'q' param for search
@@ -129,6 +130,25 @@ app.use("/",userRouter);
 
 // Favicon handler — prevents noisy 404s from browsers requesting /favicon.ico
 app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+// Privacy route
+app.get('/privacy', (req, res) => {
+  res.render("privacy");
+});
+app.get('/terms', (req, res) => {
+  res.render("terms");
+});
+
+// Terms route
+// app.get('/terms', (req, res) => {
+//   res.send(`
+//     <h1>Terms & Conditions</h1>
+//     <p>By using this website, you agree to follow our rules and provide correct information.</p>
+//     <p>Rentals, prices, and availability may change; bookings are confirmed only after successful payment.</p>
+//     <p>You are responsible for the rented item during your rental period and must pay for any loss or damage.</p>
+//     <p>We may update these terms and the privacy policy; continued use means you accept the changes.</p>
+//   `);
+// });
 
 app.use((req, res, next) => {
   next(new ExpressError(404, "Page Not Found!"));
