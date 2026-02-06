@@ -1,0 +1,134 @@
+ 
+<% layout('layouts/boilerplate') %>
+
+ <body>
+    <!-- <h3> All Listings</h3> -->
+      <!-- <form method ="GET" action ="/listings/new"> 
+        <button> Create New List </button>
+      </form> -->
+       <style>
+        #filters{
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          margin-top: 0.5rem;
+        }
+        .filter{
+          text-align: center;
+          margin-right: 0;
+          margin-top: 0;
+          opacity:0.95;
+          color:black;
+          background: #fff;
+          border: 1px solid rgba(2,6,23,0.06);
+          padding: 10px 12px;
+          border-radius: 10px;
+          box-shadow: 0 8px 20px rgba(14,30,37,0.04);
+          transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+        .filter:hover{
+          transform: translateY(-4px);
+          box-shadow: 0 14px 36px rgba(14,30,37,0.08);
+          cursor: pointer;
+          opacity: 1;
+        }
+        .filter p{
+font-size: 0.85rem;
+margin:0;
+padding-top:4px;
+color: #111;
+font-weight: 600;
+letter-spacing: 0.2px;
+        }
+        .filter a{ color: inherit; display:block; }
+        .filter i{ font-size:1.1rem; color:#fe424d }
+      </style>
+      <div id="filters">
+        <!-- <div class="filter"> -->
+   <!-- <h3>All Listings</h3> -->
+        <!-- </div> -->
+      
+        <div class="filter">
+          <a href="/listings/search?q=trending" class="filter text-decoration-none">
+          <div><i class="fa-solid fa-fire"></i></div>
+          <p>Trending</p>
+          </a>
+        </div>
+        <div class="filter">
+          <a href="/listings/search?q=Nearby" class="filter text-decoration-none">
+          <div><i class="fa-solid fa-location-dot"></i></div>
+          <p>Nearby</p>
+          </a>
+        </div>
+        <div class="filter">
+          <a href="/listings/search?q=Top Rated" class="filter text-decoration-none">
+          <div><i class="fa-solid fa-star"></i></div>
+          <p>Top Rated</p>
+          </a>
+        </div>
+        <div class="filter">
+          <a href="/listings/search?q=Rooms" class="filter text-decoration-none">
+          <div><i class="fa-solid fa-bed"></i></div>
+          <p>Rooms</p>
+          </a>
+        </div>
+        <div class="filter">
+           <a href="/listings/search?q=Entire Homes" class="filter text-decoration-none">
+          <div><i class="fa-solid fa-house"></i></div>
+          <p>Entire Homes</p>
+          </a>
+        </div>
+        
+         <div class="filter">
+          <a href="/listings/search?q=party" class="filter text-decoration-none">
+          <div><i class="fas fa-gift"></i></div>
+          <p>Party Items</p>
+          </a>
+        </div>
+
+        <!-- <div class="filter">
+          <div><i class="fa-solid fa-tractor"></i></div>
+          <p>Farms</p>
+        </div> -->
+        <div class="filter">
+          <a href="/listings/search?q=wedding" class=" filter text-decoration-none">
+          <div><i class="fas fa-magic"></i></div>
+          <p>Wedding Decor</p>
+          </a>
+        </div> 
+        <div class="filter">
+          <a href="/listings/search?q=Machine" class=" filter text-decoration-none">
+          <div><i class="fas fa-tools"></i></div>
+          <p>Tools & Machinery</p>
+          </a>
+        </div>
+        <!-- <div class="tax-toggle">x
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+          <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+        </div>
+        </div> -->
+      </div>
+      <div class ="row  row-cols-lg-3  row-cols-md-2 row-cols-sm-1" mt-3>  
+        <% for (let listing of allListings){ %>
+          <a href="/listings/<%= listing._id%>" class="listing-link">
+          <div class="card col listing-card">
+            <!-- <img src="<%= listing.image?.url || listing.image %>" class="card-img-top" alt="listing_image" style="height:20rem"> -->
+            <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height:20rem">
+
+               <div class ="card-img-overlay"></div>
+            <div class="card-body">
+              <p class="card-text">
+                <b> <%=listing.title%></b><br/>
+                &#8377;<%=(listing.price || 0).toLocaleString("en-IN")%>/night
+              </p>
+            </div>
+         </div>
+          </a>
+        <% } %>
+      </div>
+ <!-- </body> -->
+  <!-- <script>
+    let taxToggle = document.getElementById('flexSwitchCheckDefault');
+    taxSwitch.addEventListener('clicked')
+  </script> -->

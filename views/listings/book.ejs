@@ -1,0 +1,36 @@
+<% layout('layouts/boilerplate') %>
+<div class="row mt-3">
+  <div class="col-8 offset-2">
+    <h3>Booking Request</h3>
+    <form method="POST" action="/listings/<%= listing._id %>/book" novalidate class="needs-validation">
+      <div class="mb-3">
+        <label for="name" class="form-label">Full name</label>
+        <input id="name" name="booking[name]" type="text" class="form-control" value="<%= (typeof currUser !== 'undefined' && currUser && currUser.username) ? currUser.username : '' %>" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="contact" class="form-label">Contact (phone/email)</label>
+        <input id="contact" name="booking[contact]" type="text" class="form-control" required>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label for="from" class="form-label">From</label>
+          <input id="from" name="booking[from]" type="date" class="form-control" required>
+        </div>
+        <div class="mb-3 col-md-6">
+          <label for="to" class="form-label">To</label>
+          <input id="to" name="booking[to]" type="date" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="message" class="form-label">Message (optional)</label>
+        <textarea id="message" name="booking[message]" rows="3" class="form-control"></textarea>
+      </div>
+
+      <button class="btn btn-dark">Submit Booking</button>
+      <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+  </div>
+</div>
